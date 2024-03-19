@@ -4,6 +4,8 @@ project(FormatPrint
   LANGUAGES CXX
 )
 
+set(CMAKE_CXX_FLAGS "--coverage")
+
 find_package(Threads REQUIRED)
 
 # Auto download googletest
@@ -14,6 +16,9 @@ FetchContent_Declare(
   GIT_TAG        f8d7d77c06936315286eb55f8de22cd23c188571 # release-1.14.0
 )
 FetchContent_MakeAvailable(googletest)
+
+# Option pour activer ou désactiver la couverture de code
+option(ENABLE_COVERAGE "Enable coverage reporting" OFF)
 
 add_executable(testFormatPrint
   testFormatPrint.cc
@@ -29,6 +34,11 @@ target_compile_options(testFormatPrint
   PRIVATE
   "-Wall" "-Wextra" "-g" "-O0" "-fsanitize=address,undefined"
 )
+
+if(ENABLE_COVERAGE)
+  target_compile_options(testFormatPrint PRIVATE --coverage)
+  target_link_libraries(testFormatPrint PRIVATE --coverage)
+endif()
 
 target_compile_features(testFormatPrint
   PUBLIC
