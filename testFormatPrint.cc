@@ -2,114 +2,263 @@
 
 #include "Format.h"
 
-TEST(Format, onlyFormat)
-{
-  std::string result = fp::format("%d", 42);
-  EXPECT_EQ(result, "42");
-}
-
-TEST(Format, noFormat)
-{
-  std::string result = fp::format("Test");
-  EXPECT_EQ(result, "Test");
-}
-
-TEST(Format, onlyPercent)
-{
-  std::string result = fp::format("%%");
-  EXPECT_EQ(result, "%");
-}
-
-TEST(Format, formatInt)
-{
-  std::string result = fp::format("Test %d", 42);
-  EXPECT_EQ(result, "Test 42");
-
-  result = fp::format("Test %i", 69);
-  EXPECT_EQ(result, "Test 69");
-}
-
-TEST(Format, formatString1)
-{
-  std::string result = fp::format("Test %s", "Hello");
-  EXPECT_EQ(result, "Test Hello");
-}
-
-TEST(Format, formatString2)
-{
-  std::string p = "Hello";
-  std::string result = fp::format("Test %s", p);
-  EXPECT_EQ(result, "Test Hello");
-}
-
-TEST(Format, formatString3)
-{
-  char p[6] = "Hello";
-  std::string result = fp::format("Test %s", p);
-  EXPECT_EQ(result, "Test Hello");
-}
-
-TEST(Format, formatChar)
-{
-  std::string result = fp::format("Test %c", 'A');
-  EXPECT_EQ(result, "Test A");
-}
-
-TEST(Format, formatFloat)
-{
-  std::string result = fp::format("Test %f", 3.14f);
-  EXPECT_EQ(result, "Test 3.140000");
-}
-
-TEST(Format, formatDouble)
-{
-  std::string result = fp::format("Test %f", 3.1415926);
-  EXPECT_EQ(result, "Test 3.141593");
-}
-
-TEST(Format, formatPointer)
-{
-  int *ptr = nullptr;
-  std::string result = fp::format("Test %p", ptr);
-  EXPECT_EQ(result, "Test 0x0");
-}
-
-TEST(Format, formatHex)
-{
-  std::string result = fp::format("Test %x", 42);
-  EXPECT_EQ(result, "Test 2a");
-}
-
-TEST(Format, formatBool)
-{
-  std::string result = fp::format("Test %b", true);
-  EXPECT_EQ(result, "Test true");
-}
-
-namespace my
+namespace My
 {
   struct Foo
   {
     int i;
   };
-  std::string to_string(const Foo &foo)
+  std::string toString(const Foo &foo)
   {
     return std::to_string(foo.i);
   }
-
-  // Définition de l'opérateur << pour my::Foo
-  std::ostream &operator<<(std::ostream &os, const Foo &foo)
-  {
-    os << foo.i; // ou toute autre représentation de Foo que vous souhaitez imprimer
-    return os;
-  }
 }
 
-TEST(Format, formatGeneric)
+TEST(FormatGood, BasicTest)
 {
-  my::Foo foo{42};
-  std::string result = fp::format("Test %o", foo);
-  EXPECT_EQ(result, "Test 42");
+  std::string formatString = "The value of x is x";
+  std::string result = fp::format(formatString);
+  EXPECT_EQ(result, "The value of x is x");
+}
+
+TEST(FormatGood, IntTest)
+{
+  std::string formatString = "The value of x is %d";
+  int x = 5;
+  std::string result = fp::format(formatString, x);
+  EXPECT_EQ(result, "The value of x is 5");
+}
+
+TEST(FormatGood, NegativeIntTest)
+{
+  std::string formatString = "The value of x is %d";
+  int x = -5;
+  std::string result = fp::format(formatString, x);
+  EXPECT_EQ(result, "The value of x is -5");
+}
+
+TEST(FormatGood, UnsignedIntTest)
+{
+  std::string formatString = "The value of x is %i";
+  unsigned int x = 5;
+  std::string result = fp::format(formatString, x);
+  EXPECT_EQ(result, "The value of x is 5");
+}
+
+TEST(FormatGood, LongTest)
+{
+  std::string formatString = "The value of x is %d";
+  long x = 5;
+  std::string result = fp::format(formatString, x);
+  EXPECT_EQ(result, "The value of x is 5");
+}
+
+TEST(FormatGood, LongLongTest)
+{
+  std::string formatString = "The value of x is %d";
+  long long x = 5;
+  std::string result = fp::format(formatString, x);
+  EXPECT_EQ(result, "The value of x is 5");
+}
+
+TEST(FormatGood, UnsignedLongTest)
+{
+  std::string formatString = "The value of x is %d";
+  unsigned long x = 5;
+  std::string result = fp::format(formatString, x);
+  EXPECT_EQ(result, "The value of x is 5");
+}
+
+TEST(FormatGood, UnsignedLongLongTest)
+{
+  std::string formatString = "The value of x is %d";
+  unsigned long long x = 5;
+  std::string result = fp::format(formatString, x);
+  EXPECT_EQ(result, "The value of x is 5");
+}
+
+TEST(FormatGood, FloatTest)
+{
+  std::string formatStringf = "The value of x is %f";
+  float x = 5.5;
+  std::string result = fp::format(formatStringf, x);
+  EXPECT_EQ(result, "The value of x is 5.500000");
+}
+
+TEST(FormatGood, StringTest)
+{
+  std::string formatString = "The value of x is %s";
+  std::string x = "666 the devil number";
+  std::string result = fp::format(formatString, x);
+  EXPECT_EQ(result, "The value of x is 666 the devil number");
+}
+
+TEST(FormatGood, PointerTest)
+{
+  std::string formatString = "The value of x is %p";
+  int x = 5;
+  std::string result = fp::format(formatString, &x);
+  std::string address = "The value of x is " + fp::toString(&x);
+  EXPECT_EQ(result, address);
+}
+
+TEST(FormatGood, testChar)
+{
+  std::string formatString = "The value of x is %c";
+  char x = '5';
+  std::string result = fp::format(formatString, x);
+  EXPECT_EQ(result, "The value of x is 5");
+}
+
+TEST(FormatGood, testHex)
+{
+  std::string formatString = "The value of x is %x";
+  int x = 5;
+  int y = 10;
+  int z = 15;
+  int a = 16;
+  std::string result = fp::format(formatString, x);
+  EXPECT_EQ(result, "The value of x is 0x5");
+  result = fp::format(formatString, y);
+  EXPECT_EQ(result, "The value of x is 0xa");
+  result = fp::format(formatString, z);
+  EXPECT_EQ(result, "The value of x is 0xf");
+  result = fp::format(formatString, a);
+  EXPECT_EQ(result, "The value of x is 0x10");
+}
+
+TEST(FormatGood, UserDefinedTypeTest)
+{
+  std::string formatString = "The value of x is %o";
+  My::Foo x = {5};
+  std::string result = fp::format(formatString, x);
+  EXPECT_EQ(result, "The value of x is 5");
+}
+
+TEST(FormatGood, MultipleUserDefinedTypesTest)
+{
+  std::string formatString = "The values are %o and %o";
+  My::Foo x = {5};
+  My::Foo y = {10};
+  std::string result = fp::format(formatString, x, y);
+  EXPECT_EQ(result, "The values are 5 and 10");
+}
+
+TEST(FormatGood, UserDefinedTypeWithOtherTypesTest)
+{
+  std::string formatString = "The values are %d, %o and %s";
+  int i = 5;
+  My::Foo x = {10};
+  std::string s = "test";
+  std::string result = fp::format(formatString, i, x, s);
+  EXPECT_EQ(result, "The values are 5, 10 and test");
+}
+
+TEST(FormatGood, UserDefinedTypeAddresseTest)
+{
+  std::string formatString = "The value of x is %p";
+  My::Foo x = {5};
+  std::string result = fp::format(formatString, &x);
+  std::string address = "The value of x is " + fp::toString(&x);
+  EXPECT_EQ(result, address);
+}
+
+TEST(FormatGood, MultipleArgsTest)
+{
+  int i = 5;
+  float f = 5.123456;
+  char c = 'c';
+  int x = 42;
+  std::string s = "string";
+  std::string formatString = "I panic, I put everything : %d, %i, %f, %x, %c, %s, %p";
+  std::string result = fp::format(formatString, i, i, f, x, c, s, &i);
+  std::string address = "I panic, I put everything : 5, 5, 5.123456, 0x2a, c, string, " + fp::toString(&i);
+  EXPECT_EQ(result, address);
+}
+
+TEST(FormatGood, NoSubstitutionTest)
+{
+  std::string formatString = "I panic, I put everything : %%d, %%i, %%f, %%x, %%c, %%s, %%p";
+  std::string result = fp::format(formatString);
+  std::string address = "I panic, I put everything : %d, %i, %f, %x, %c, %s, %p";
+  EXPECT_EQ(result, address);
+}
+
+/************************************************************
+ * Test cases for wrong format                              *
+ ************************************************************/
+
+TEST(FormatWrong, testFloatOverLimit)
+{
+  std::string formatStringf = "The value of x is %f";
+  std::string formatStringF = "The value of x is %F";
+  float x = 5.1234567890;
+  EXPECT_EQ(fp::format(formatStringf, x), "The value of x is 5.123457");
+}
+
+TEST(FormatWrong, testPercentOnly)
+{
+  std::string formatString = "I love %";
+  EXPECT_THROW(fp::format(formatString), std::runtime_error);
+}
+
+TEST(FormatWrong, testUnknownSpecifier)
+{
+  std::string formatString = "Tell me %y";
+  EXPECT_THROW(fp::format(formatString), std::runtime_error);
+}
+
+TEST(FormatWrong, testNoMatchingSpecifiers)
+{
+  std::string formatString = "I panic, I put everything : %d, %i, %f, %x, %c, %s, %p";
+  int i = 5;
+  std::string s = "kirbo";
+  char c = 'c';
+  EXPECT_THROW(fp::format(formatString, s, c, s, s, i, i, i), std::runtime_error);
+}
+
+TEST(FormatWrong, ExampleWithInvalidCharacter) {
+  EXPECT_THROW(fp::format("Invalid character: %c%c%c", "abc"), std::runtime_error);
+}
+
+TEST(FormatTest, ExampleWithInvalidTypeIntChar) {
+  char c = 'a';
+  EXPECT_THROW(fp::format("Invalid integer: %i", c), std::runtime_error);
+}
+
+TEST(FormatWrong, testNoArgumentPassed)
+{
+  std::string formatString = "I panic, I put everything : %d, %i, %f, %x, %c, %s, %p";
+  EXPECT_THROW(fp::format(formatString), std::runtime_error);
+}
+
+TEST(FormatWrong, UserDefinedTypeWithWrongSpecifierTest)
+{
+  std::string formatString = "The value of x is %d";
+  My::Foo x = {5};
+  EXPECT_THROW(fp::format(formatString, x), std::runtime_error);
+}
+
+TEST(FormatWrong, TooManyArgumentsTest)
+{
+  std::string formatString = "The value of x is %d";
+  int i = 5;
+  My::Foo x = {10};
+  EXPECT_THROW(fp::format(formatString, i, x), std::runtime_error);
+}
+
+TEST(FormatWrong, NotEnoughArgumentsTest)
+{
+  std::string formatString = "The values are %d and %d";
+  int i = 5;
+  EXPECT_THROW(fp::format(formatString, i), std::runtime_error);
+}
+
+TEST(FormatWrong, ExtraSpecifierTest)
+{
+  std::string formatString = "The value of x is %d%d";
+  int i = 5;
+  EXPECT_THROW(fp::format(formatString, i), std::runtime_error);
 }
 
 int main(int argc, char *argv[])

@@ -2,13 +2,19 @@
 #include <string>
 #include <sstream>
 #include <stdexcept>
-#include <cstdint> // Nécessaire pour std::uintptr_t
-#include <iomanip> // Pour std::setprecision
+#include <cstdint> // Necessary for std::uintptr_t
+#include <iomanip> // For std::setprecision
+#include <typeindex>
 
 namespace fp
 {
-
-  // Fonction générique toString
+  /**
+   * @brief Generic toString function
+   * 
+   * @tparam T Type of the value
+   * @param value The value to convert to string
+   * @return std::string The value as a string
+   */
   template <typename T>
   std::string toString(const T &value)
   {
@@ -17,7 +23,12 @@ namespace fp
     return oss.str();
   }
 
-  // Surcharge pour les chaînes de caractères
+  /**
+   * @brief Overload for std::string
+   * 
+   * @param value The string to convert to string
+   * @return std::string The value as a string
+   */
   std::string toString(const std::string &value)
   {
     if (value.empty())
@@ -25,7 +36,12 @@ namespace fp
     return value;
   }
 
-  // Surcharge pour les chaînes de caractères C-style (chaînes littérales)
+  /**
+   * @brief Overload for C-style strings (literal strings)
+   * 
+   * @param value The C-style string to convert to string
+   * @return std::string The value as a string
+   */
   std::string toString(const char *value)
   {
     if (!value)
@@ -33,7 +49,13 @@ namespace fp
     return std::string(value);
   }
 
-  // Surcharge pour les pointeurs
+  /**
+   * @brief Overload for pointers
+   * 
+   * @tparam T Type of the pointer
+   * @param ptr The pointer to convert to string
+   * @return std::string The value as a string
+   */
   template <typename T>
   std::string toString(T *ptr)
   {
@@ -44,7 +66,12 @@ namespace fp
     return oss.str();
   }
 
-  // Surcharge pour float
+  /**
+   * @brief Overload for float
+   * 
+   * @param value The float to convert to string
+   * @return std::string The value as a string
+   */
   std::string toString(float value)
   {
     std::ostringstream oss;
@@ -52,7 +79,12 @@ namespace fp
     return oss.str();
   }
 
-  // Surcharge pour double
+  /**
+   * @brief Overload for double
+   * 
+   * @param value The double to convert to string
+   * @return std::string The value as a string
+   */
   std::string toString(double value)
   {
     std::ostringstream oss;
@@ -60,25 +92,110 @@ namespace fp
     return oss.str();
   }
 
-  // Surcharge pour booléens
+  /**
+   * @brief Overload for booleans
+   * 
+   * @param value The boolean to convert to string
+   * @return std::string The value as a string
+   */
   std::string toString(bool value)
   {
     return value ? "true" : "false";
   }
 
+  /**
+   * @brief Overload for unsigned int
+   * 
+   * @param value The unsigned int to convert to string
+   * @return std::string The value as a string
+   */
+  std::string toString(unsigned int value)
+  {
+    std::ostringstream oss;
+    oss << value;
+    return oss.str();
+  }
+
+  /**
+   * @brief Overload for long
+   * 
+   * @param value The long to convert to string
+   * @return std::string The value as a string
+   */
+  std::string toString(long value)
+  {
+    std::ostringstream oss;
+    oss << value;
+    return oss.str();
+  }
+
+  /**
+   * @brief Overload for long long
+   * 
+   * @param value The long long to convert to string
+   * @return std::string The value as a string
+   */
+  std::string toString(long long value)
+  {
+    std::ostringstream oss;
+    oss << value;
+    return oss.str();
+  }
+
+  /**
+   * @brief Overload for unsigned long
+   * 
+   * @param value The unsigned long to convert to string
+   * @return std::string The value as a string
+   */
+  std::string toString(unsigned long value)
+  {
+    std::ostringstream oss;
+    oss << value;
+    return oss.str();
+  }
+
+  /**
+   * @brief Overload for unsigned long long
+   * 
+   * @param value The unsigned long long to convert to string
+   * @return std::string The value as a string
+   */
+  std::string toString(unsigned long long value)
+  {
+    std::ostringstream oss;
+    oss << value;
+    return oss.str();
+  }
+
+  /**
+   * @brief Converts a string to hexadecimal
+   * 
+   * @param n The string to convert
+   * @return std::string The hexadecimal representation of the string
+   */
   std::string stringToHex(std::string n)
   {
     long num = std::stol(n);
-    // Masquage pour obtenir seulement les 32 bits inférieurs
+    // Masking to get only the lower 32 bits
     unsigned int maskedNum = static_cast<unsigned int>(num);
     std::stringstream ss;
     ss << "0x" << std::hex << maskedNum;
     return ss.str();
   }
 
+  /**
+   * @brief Formats a string with the given arguments
+   * 
+   * @tparam Args Types of the arguments
+   * @param formatString The format string
+   * @param args The arguments to format the string with
+   * @return std::string The formatted string
+   */
   template <typename... Args>
   std::string format(const std::string &formatString, const Args &...args)
   {
+    std::vector<std::type_index> argsType = {typeid(args)...};
     std::vector<std::string> argsList = {toString(args)...};
     std::ostringstream oss;
     size_t argIndex = 0;
@@ -94,48 +211,118 @@ namespace fp
         char specifier = formatString[i + 1];
         switch (specifier)
         {
+        case 'o':
+          if (argIndex >= argsList.size())
+          {
+            throw std::runtime_error("Too few arguments provided for the format specifiers.");
+          }
+          oss << argsList[argIndex];
+          argIndex++;
+          i++; // Skip the specifier character
+          break;
+        case 'u':
         case 'd':
         case 'i':
-        case 'u':
-        case 'o':
-        case 'x':
-        case 'X':
-        case 'f':
-        case 'F':
-        case 'a':
-        case 'A':
-        case 'c':
+          if (argIndex >= argsList.size())
+          {
+            throw std::runtime_error("Too few arguments provided for the format specifiers.");
+          }
+          if (argsType[argIndex] != typeid(int) && argsType[argIndex] != typeid(unsigned int) &&
+              argsType[argIndex] != typeid(long) && argsType[argIndex] != typeid(long long) &&
+              argsType[argIndex] != typeid(unsigned long) && argsType[argIndex] != typeid(unsigned long long))
+          {
+            throw std::runtime_error("Invalid argument type for format specifier %i: expected int or similar.");
+          }
+          oss << argsList[argIndex];
+          argIndex++;
+          i++; // Skip the specifier character
+          break;
         case 's':
+          if (argIndex >= argsList.size())
+          {
+            throw std::runtime_error("Too few arguments provided for the format specifiers.");
+          }
+          if (argsType[argIndex] != typeid(std::string) && argsType[argIndex] != typeid(char *))
+          {
+            throw std::runtime_error("Invalid argument type for format specifier %s: expected string.");
+          }
+          oss << argsList[argIndex];
+          argIndex++;
+          i++; // Skip the specifier character
+          break;
+        case 'c':
+          if (argIndex >= argsList.size())
+          {
+            throw std::runtime_error("Too few arguments provided for the format specifiers.");
+          }
+          if (argsType[argIndex] != typeid(char))
+          {
+            throw std::runtime_error("Invalid argument type for format specifier %c: expected char.");
+          }
+          oss << argsList[argIndex];
+          argIndex++;
+          i++; // Skip the specifier character
+          break;
         case 'p':
+          if (argIndex >= argsList.size())
+          {
+            throw std::runtime_error("Too few arguments provided for the format specifiers.");
+          }
+          oss << argsList[argIndex];
+          argIndex++;
+          i++; // Skip the specifier character
+          break;
+
+        case 'f':
+        case 'a':
+          if (argIndex >= argsList.size())
+          {
+            throw std::runtime_error("Too few arguments provided for the format specifiers.");
+          }
+          if (argsType[argIndex] != typeid(float) && argsType[argIndex] != typeid(double))
+          {
+            throw std::runtime_error("Invalid argument type for format specifier %f: expected float or double.");
+          }
+          oss << argsList[argIndex];
+          argIndex++;
+          i++; // Skip the specifier character
+          break;
+        case 'x':
+          if (argIndex >= argsList.size())
+          {
+            throw std::runtime_error("Too few arguments provided for the format specifiers.");
+          }
+          if (argsType[argIndex] != typeid(int))
+          {
+            throw std::runtime_error("Invalid argument type for format specifier %x: expected int.");
+          }
+          oss << std::hex << std::showbase << std::stoi(argsList[argIndex]);
+          argIndex++;
+          i++; // Skip the specifier character
+          break;
         case 'n':
+          if (argIndex >= argsList.size())
+          {
+            throw std::runtime_error("Too few arguments provided for the format specifiers.");
+          }
+          if (argsType[argIndex] != typeid(int))
+          {
+            throw std::runtime_error("Invalid argument type for format specifier %n: expected int.");
+          }
+          oss << stringToHex(argsList[argIndex]);
+          argIndex++;
+          i++; // Skip the specifier character
+          break;
         case 'b':
           if (argIndex >= argsList.size())
           {
             throw std::runtime_error("Too few arguments provided for the format specifiers.");
           }
-          if (specifier == 'x' || specifier == 'X')
+          if (argsType[argIndex] != typeid(bool))
           {
-            oss << stringToHex(argsList[argIndex]);
+            throw std::runtime_error("Invalid argument type for format specifier %b: expected bool.");
           }
-          else
-          {
-            oss << argsList[argIndex];
-          }
-          if (specifier == 'b')
-          {
-            if (argsList[argIndex] == "1")
-            {
-              oss << "true";
-            }
-            else if (argsList[argIndex] == "0")
-            {
-              oss << "false";
-            }
-            argIndex++;
-            i++;      // Avance pour passer le spécificateur de format.
-            continue; // Passe au prochain caractère dans formatString sans exécuter les parties suivantes de la boucle.
-          }
-
+          oss << argsList[argIndex];
           argIndex++;
           i++; // Skip the specifier character
           break;
