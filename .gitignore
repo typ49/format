@@ -12,3 +12,5 @@ _deps
 
 build/
 !build/.gitkeep
+
+*.tar.gz
